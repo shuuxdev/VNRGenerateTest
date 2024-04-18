@@ -11,7 +11,6 @@ string modelPath = @"D:\Code\Main\Source\Presentation\HRM.Presentation.Hr.Models
 
 var builder = WebHost.CreateDefaultBuilder();
 
-var app = builder.Build();
 var matchers = typeof(PatternMatchers).GetMethods().ToList();
 
 List<Task<List<ResultModel>>> tasks = new();

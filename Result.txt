@@ -1,0 +1,126 @@
+[LanguageKeyMapping("")]
+    public WebElement sml_TK_ProfileID => FindWebElement(By.XPath("//span[@id='Hre_Profile__Index__SProfileID']\"));
+[LanguageKeyMapping("HRM_HR_Profile_ProfileName")]
+    public WebElement TextBox_TK_ProfileName => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__SProProfileName']\"));
+[LanguageKeyMapping("HRM_HR_Profile_FirstName")]
+    public WebElement TextBox_TK_FirstName => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__SFirstName']\"));
+[LanguageKeyMapping("HRM_HR_Profile_NameEnglish")]
+    public WebElement TextBox_TK_NameEnglish => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__SProNameEnglish']\"));
+[LanguageKeyMapping("HRM_HR_Profile_CodeEmp")]
+    public WebElement TextBox_TK_CodeEmp => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__SCodeEmp']\"));
+[LanguageKeyMapping("HRM_Cat_Cat_RatioMission_CompanyID")]
+    public WebElement sml_TK_StrCompanyID => FindWebElement(By.XPath("//span[@id='StrCompanyID']\"));
+[LanguageKeyMapping("HRM_HR_Profile_JobTitleID")]
+    public WebElement sml_TK_JobTitleID => FindWebElement(By.XPath("//span[@id='Hre_Profile__Index__SJobTitleID']\"));
+[LanguageKeyMapping("HRM_HR_Profile_PositionID")]
+    public WebElement sml_TK_PositionID => FindWebElement(By.XPath("//span[@id='Hre_Profile__Index__SPositionID']\"));
+[LanguageKeyMapping("HRM_HR_WorkHistory_AbilityTileID")]
+    public WebElement sml_TK_StrAbilityTileID => FindWebElement(By.XPath("//span[@id='Hre_Profile__Index__StrAbilityTileID']\"));
+[LanguageKeyMapping("HRM_HR_Profile_SalaryClassID")]
+    public WebElement sml_TK_StrSalaryClassID => FindWebElement(By.XPath("//span[@id='Hre_Profile__Index__StrSalaryClassID']\"));
+[LanguageKeyMapping("")]
+    public WebElement sml_TK_strUnitStructureIDs => FindWebElement(By.XPath("//span[@id='strUnitStructureIDs']\"));
+[LanguageKeyMapping("")]
+    public WebElement ddl_TK_EmploymentType => FindWebElement(By.XPath("//input[@id='SEmploymentType']\"));
+[LanguageKeyMapping("HRM_HR_Profile_SupervisiorID")]
+    public WebElement sml_TK_SupervisorIDs => FindWebElement(By.XPath("//span[@id='SupervisorIDs']\"));
+[LanguageKeyMapping("HRM_HR_Profile_MidSupervisorID")]
+    public WebElement sml_TK_MidSupervisorIDs => FindWebElement(By.XPath("//span[@id='MidSupervisorIDs']\"));
+[LanguageKeyMapping("HRM_HR_Profile_NextSupervisorID")]
+    public WebElement sml_TK_NextSupervisorIDs => FindWebElement(By.XPath("//span[@id='NextSupervisorIDs']\"));
+[LanguageKeyMapping("HRM_HR_Profile_HighSupervisiorID")]
+    public WebElement sml_TK_HighSupervisorIDs => FindWebElement(By.XPath("//span[@id='HighSupervisorIDs']\"));
+[LanguageKeyMapping("")]
+    public WebElement sml_TK_strAreaPostJobWorkID => FindWebElement(By.XPath("//span[@id='strAreaPostJobWorkID']\"));
+[LanguageKeyMapping("")]
+    public WebElement sml_TK_LaborType => FindWebElement(By.XPath("//span[@id='Hre_Profile__Index__LaborType']\"));
+[LanguageKeyMapping("HRM_HR_Profile_EmpTypeID")]
+    public WebElement sml_TK_StrEmpTypeID => FindWebElement(By.XPath("//span[@id='Hre_Profile__Index__StrEmpTypeID']\"));
+[LanguageKeyMapping("HRM_HR_Profile_EmployeeGroupID")]
+    public WebElement sml_TK_StrEmployeeGroupID => FindWebElement(By.XPath("//span[@id='Hre_Profile__Index__StrEmployeeGroupID']\"));
+[LanguageKeyMapping("HRM_HR_Profile_PayrollGroupID")]
+    public WebElement sml_TK_PayrollGroupIDs => FindWebElement(By.XPath("//span[@id='Hre_Profile__Index__PayrollGroupIDs']\"));
+[LanguageKeyMapping("HRM_Canteen_Report_workPlaceId")]
+    public WebElement sml_TK_StrWorkPlaceID => FindWebElement(By.XPath("//span[@id='Hre_Profile__Index__StrWorkPlaceID']\"));
+[LanguageKeyMapping("HRM_HR_Profile_GraduatedLevelID")]
+    public WebElement sml_TK_GraduatedLevelIDs => FindWebElement(By.XPath("//span[@id='Hre_Profile__Index__GraduatedLevelIDs']\"));
+[LanguageKeyMapping("HRM_Rec_JobVacancy_EducationLevelIDs")]
+    public WebElement sml_TK_EducationLevelIDs => FindWebElement(By.XPath("//span[@id='Hre_Profile__Index__EducationLevelIDs']\"));
+[LanguageKeyMapping("HRM_HR_ProfileAll_PlaceOfBirthIDs")]
+    public WebElement sml_TK_PlaceOfBirthIDs => FindWebElement(By.XPath("//span[@id='Hre_Profile__Index__PlaceOfBirthIDs']\"));
+[LanguageKeyMapping("HRM_HR_Profile_DateHire")]
+    public WebElement dtp_TK_JoiningDateFrom => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__JoiningDateFrom']\"));
+[LanguageKeyMapping("")]
+    public WebElement dtp_TK_JoiningDateTo => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__JoiningDateTo']\"));
+[LanguageKeyMapping("HRM_Hre_Profile_DateComeBack")]
+    public WebElement dtp_TK_DateComeBackFrom => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__DateComeBackFrom']\"));
+[LanguageKeyMapping("")]
+    public WebElement dtp_TK_DateComeBackTo => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__DateComeBackTo']\"));
+[LanguageKeyMapping("HRM_HR_Profile_DateSenior")]
+    public WebElement dtp_TK_DateSeniorFrom => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__DateSeniorFrom']\"));
+[LanguageKeyMapping("HRM_HR_Profile_DateSenior")]
+    public WebElement dtp_TK_DateSeniorTo => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__DateSeniorTo']\"));
+[LanguageKeyMapping("HRM_HR_Profile_DateHire")]
+    public WebElement dtp_TK_DateFrom => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__DateFrom']\"));
+[LanguageKeyMapping("HRM_HR_Profile_DateTo")]
+    public WebElement dtp_TK_DateTo => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__DateTo']\"));
+[LanguageKeyMapping("")]
+    public WebElement dtp_TK_DateHireNewFrom => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__DateHireNewFrom']\"));
+[LanguageKeyMapping("")]
+    public WebElement dtp_TK_DateHireNewTo => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__DateHireNewTo']\"));
+[LanguageKeyMapping("HRM_HR_Profile_DateStartProbation")]
+    public WebElement dtp_TK_DateFromDateStartProbation => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__DateFromDateStartProbation']\"));
+[LanguageKeyMapping("")]
+    public WebElement dtp_TK_DateToDateStartProbation => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__DateToDateStartProbation']\"));
+[LanguageKeyMapping("HRM_HR_Profile_DateEndProbation")]
+    public WebElement dtp_TK_DateFromDateEndProbation => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__DateFromDateEndProbation']\"));
+[LanguageKeyMapping("")]
+    public WebElement dtp_TK_DateToDateEndProbation => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__DateToDateEndProbation']\"));
+[LanguageKeyMapping("HRM_HR_Profile_IDDateOfExpired")]
+    public WebElement dtp_TK_DateFromIDDateOfExpired => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__DateFromIDDateOfExpired']\"));
+[LanguageKeyMapping("")]
+    public WebElement dtp_TK_DateToIDDateOfExpired => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__DateToIDDateOfExpired']\"));
+[LanguageKeyMapping("HRM_HR_Profile_CodeAttendance")]
+    public WebElement TextBox_TK_CodeAttendance => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__SCodeAttendance']\"));
+[LanguageKeyMapping("HRM_HR_Profile_CodeEmpClient")]
+    public WebElement TextBox_TK_CodeEmpClient => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__SCodeEmpClient']\"));
+[LanguageKeyMapping("HRM_HR_Profile_CodeTax")]
+    public WebElement TextBox_TK_CodeTax => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__SCodeTax']\"));
+[LanguageKeyMapping("HRM_HR_Profile_Gender")]
+    public WebElement sml_TK_Gender => FindWebElement(By.XPath("//span[@id='Hre_Profile__Index__Gender']\"));
+[LanguageKeyMapping("HRM_Category_ContractType_NationalityGroupListCode")]
+    public WebElement sml_TK_strNationalityGroupListCode => FindWebElement(By.XPath("//span[@id='strNationalityGroupListCode']\"));
+[LanguageKeyMapping("HRM_HR_Profile_IDNo")]
+    public WebElement TextBox_TK_IDNo => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__SIDNo']\"));
+[LanguageKeyMapping("HRM_HR_Profile_PassportNo")]
+    public WebElement TextBox_TK_PassportNo => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__SPassportNo']\"));
+[LanguageKeyMapping("HRM_HR_Profile_IDCard")]
+    public WebElement TextBox_TK_IDCard => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__IDCard']\"));
+[LanguageKeyMapping("HRM_HR_Profile_SpecialAreaID")]
+    public WebElement sml_TK_StrSpecialAreaID => FindWebElement(By.XPath("//span[@id='Hre_Profile__Index__StrSpecialAreaID']\"));
+[LanguageKeyMapping("HRM_HR_Profile_SendMailStatusEmpNew")]
+    public WebElement ddl_TK_SendMailStatusEmpNew => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__SendMailStatusEmpNew']\"));
+[LanguageKeyMapping("HRM_Hre_Contract_Index_AssessmentStatus")]
+    public WebElement sml_TK_AssessmentStatus => FindWebElement(By.XPath("//span[@id='AssessmentStatus']\"));
+[LanguageKeyMapping("HRM_HR_Profile_PasswordPaySlip")]
+    public WebElement ddl_TK_IsPasswordPaySlip => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__IsPasswordPaySlip']\"));
+[LanguageKeyMapping("HRM_Hre_Contract_Index_CountryIDs")]
+    public WebElement sml_TK_CountryIDs => FindWebElement(By.XPath("//span[@id='SCountryIDs']\"));
+[LanguageKeyMapping("HRM_Hre_Contract_Index_ProvinceIDs")]
+    public WebElement sml_TK_ProvinceIDs => FindWebElement(By.XPath("//span[@id='SProvinceIDs']\"));
+[LanguageKeyMapping("HRM_HR_Profile_IsTalent")]
+    public WebElement ckb_TK_IsTalent => FindWebElement(By.XPath("//input[@id='IsTalent']\"));
+[LanguageKeyMapping("HRM_HR_Profile_IsRootProfile")]
+    public WebElement ckb_TK_IsRoot => FindWebElement(By.XPath("//input[@id='IsRoot']\"));
+[LanguageKeyMapping("HRM_HR_Profile_IsNotHavingMail")]
+    public WebElement ckb_TK_IsHavingNotEmail => FindWebElement(By.XPath("//input[@id='IsHavingNotEmail']\"));
+[LanguageKeyMapping("HRM_HR_Profile_SendingEmpInfoMailTime")]
+    public WebElement ckb_TK_SendingEmpInfoMailTime => FindWebElement(By.XPath("//input[@id='SendingEmpInfoMailTime']\"));
+[LanguageKeyMapping("")]
+    public WebElement ddl_TK_ => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__ddlScreenNameWord']\"));
+[LanguageKeyMapping("")]
+    public WebElement ddl_TK_ => FindWebElement(By.XPath("//input[@id='ddlScreenNameProfileCard']\"));
+[LanguageKeyMapping("")]
+    public WebElement ddl_TK_ => FindWebElement(By.XPath("//input[@id='Hre_Profile__Index__ddlScreenName']\"));
+[LanguageKeyMapping("HRM_HR_Profile_OrgStructureID")]
+    public WebElement TreeViewDropdDownBuilderInfo_TK_ => FindWebElement(By.XPath("//input[@id='']\"));

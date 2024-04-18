@@ -9,8 +9,8 @@ public class APIController : ControllerBase
     {
 
     }
-    public async Task<IActionResult> Index(string id)
+    public async Task<IActionResult> Process()
     {
-
+        return Ok();
     }
 }
