@@ -12,8 +12,9 @@ public static class DictionaryHelper
         Dictionary<(int startIndex, int endIndex), string> lines = new();
         for (int i = 0, currentLineIndex = 0; i < linesArray.Length; currentLineIndex += linesArray[i].Length - 1, ++i)
         {
-
-            lines[(currentLineIndex, currentLineIndex + linesArray[i].Length - 1)] = linesArray[i];
+            int startIndex = currentLineIndex;
+            int endIndex = (linesArray[i].Length == 0) ? currentLineIndex : currentLineIndex + linesArray[i].Length - 1;
+            lines[(startIndex, endIndex)] = linesArray[i];
             if (i < linesArray.Length - 1)
             {
                 currentLineIndex += Environment.NewLine.Length + 1;
@@ -137,11 +138,11 @@ public static class DictionaryHelper
             }
         }
         string result = string.Empty;
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("===================================================================================");
+        // Console.ForegroundColor = ConsoleColor.Green;
+        // Console.WriteLine("===================================================================================");
 
-        Console.ForegroundColor = ConsoleColor.DarkGreen;
-        Console.WriteLine("Line: {0} -> {1}", up, down);
+        // Console.ForegroundColor = ConsoleColor.DarkGreen;
+        // Console.WriteLine("Line: {0} -> {1}", up, down);
 
         for (int i = Math.Max(up, 0); i <= Math.Min(down, lines.Length - 1); ++i)
         {
@@ -151,8 +152,8 @@ public static class DictionaryHelper
                 result += Environment.NewLine;
             }
         }
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine(result);
+        // Console.ForegroundColor = ConsoleColor.Yellow;
+        // Console.WriteLine(result);
 
         return result;
 

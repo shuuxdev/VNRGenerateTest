@@ -31,8 +31,9 @@ public static class PatternMatchers
             string viewName = cshtmlPath.Substring(cshtmlPath.LastIndexOf("\\") + 1).Replace(".cshtml", string.Empty);
             string[] classNameWithDotsSeperated = Regex.Match(content, @"^\@model\s+([a-zA-Z_.]*)", RegexOptions.Multiline).Groups[1].Value.Split(".");
             string className = classNameWithDotsSeperated[classNameWithDotsSeperated.Length - 1];
-
+            string followingName = cshtmlPath.Split("\\")[cshtmlPath.Split("\\").Length - 2];
             //Fields cần trả về
+            string category = followingName.Split("_")[0];
             string controlType = Helper.GetControlType(fullControlName.Replace("For", string.Empty)); //fieldType
             string pageType = viewName == "Index" ? "TK" : "TM"; //pageType
             string property = null; //fieldName
@@ -127,6 +128,10 @@ public static class PatternMatchers
 
             result.Add(new ResultModel()
             {
+                followingName = followingName,
+                viewName = viewName,
+                className = className,
+                category = category,
                 fieldType = controlType,
                 pageType = pageType,
                 languageKey = languageKey,
@@ -151,9 +156,10 @@ public static class PatternMatchers
             string viewName = cshtmlPath.Substring(cshtmlPath.LastIndexOf("\\") + 1).Replace(".cshtml", string.Empty);
             string[] classNameWithDotsSeperated = Regex.Match(content, @"^\@model\s+([a-zA-Z_.]*)", RegexOptions.Multiline).Groups[1].Value.Split(".");
             string className = classNameWithDotsSeperated[classNameWithDotsSeperated.Length - 1];
-
+            string followingName = cshtmlPath.Split("\\")[cshtmlPath.Split("\\").Length - 2];
             //Fields cần trả về
-            string controlType = Helper.GetControlType(fullControlName); //fieldType
+            string category = followingName.Split("_")[0];
+            string controlType = Helper.GetControlType(fullControlName.Replace("For", string.Empty)); //fieldType
             string pageType = viewName == "Index" ? "TK" : "TM"; //pageType
             string property = null; //fieldName
             string languageKey = null; //languageKey
@@ -191,6 +197,10 @@ public static class PatternMatchers
 
             result.Add(new ResultModel()
             {
+                followingName = followingName,
+                viewName = viewName,
+                className = className,
+                category = category,
                 fieldType = controlType,
                 pageType = pageType,
                 languageKey = languageKey,
@@ -214,8 +224,9 @@ public static class PatternMatchers
             string viewName = cshtmlPath.Substring(cshtmlPath.LastIndexOf("\\") + 1).Replace(".cshtml", string.Empty);
             string[] classNameWithDotsSeperated = Regex.Match(content, @"^\@model\s+([a-zA-Z_.]*)", RegexOptions.Multiline).Groups[1].Value.Split(".");
             string className = classNameWithDotsSeperated[classNameWithDotsSeperated.Length - 1];
-
+            string followingName = cshtmlPath.Split("\\")[cshtmlPath.Split("\\").Length - 2];
             //Fields cần trả về
+            string category = followingName.Split("_")[0];
             string controlType = Helper.GetControlType(fullControlName); //fieldType
             string pageType = viewName == "Index" ? "TK" : "TM"; //pageType
             string property = null; //fieldName
@@ -297,6 +308,10 @@ public static class PatternMatchers
 
             result.Add(new ResultModel()
             {
+                followingName = followingName,
+                viewName = viewName,
+                className = className,
+                category = category,
                 fieldType = controlType,
                 pageType = pageType,
                 languageKey = languageKey,
