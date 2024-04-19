@@ -1,2 +1,5 @@
 /obj
 /bin
+.vscode/tasks.json
+.vscode/settings.json
+VNRGenerateTest.sln

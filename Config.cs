@@ -2,7 +2,22 @@ public static class Config
 {
     public static ModelParsingMode modelParsingMode = ModelParsingMode.StringProcessing;
 
-
+    public static LoggingMode loggingMode = LoggingMode.None;
+}
+public enum LoggingMode
+{
+    Control,
+    Model,
+    All,
+    None
+}
+public enum Category
+{
+    Hre,
+    Sys,
+    Cat,
+    Ins,
+    All
 }
 public enum ModelParsingMode
 {

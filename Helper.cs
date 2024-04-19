@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -228,11 +229,16 @@ public static class Helper
             }
             nextPropertyLineIndex = currentLineIndex;
             string propertyScope = string.Join(Environment.NewLine, classContentSplittedIntoLines.Skip(previousPropertyLineIndex).Take(nextPropertyLineIndex - previousPropertyLineIndex + 1));
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("========================================================");
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("Property: {0}", property);
-            Console.WriteLine(propertyScope);
+
+            if (Config.loggingMode == LoggingMode.All || Config.loggingMode == LoggingMode.Model)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("========================================================");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Property: {0}", property);
+                Console.WriteLine(propertyScope);
+            }
+
 
             for (int i = previousPropertyLineIndex; i <= matchedPropertyLineIndex; ++i)
             {

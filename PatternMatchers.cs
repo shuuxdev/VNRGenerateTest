@@ -81,7 +81,6 @@ public static class PatternMatchers
 
             Console.ForegroundColor = ConsoleColor.Green;
             //Trường hợp tìm không thấy, ta sẽ thử tìm VnrLabel trong FieldTitle
-            Console.WriteLine("Language key: {0} property {1} control {2}", languageKey, property, controlType);
             int newKeywordIndex = content.Substring(0, match.Index).LastIndexOf("new");
             if (newKeywordIndex == -1)
             {
