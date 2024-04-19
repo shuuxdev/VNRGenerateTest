@@ -125,7 +125,7 @@ public static class MainFunctionality
             string objectPath = $"./Results/{r.category}/{r.followingName}/{r.followingName}_{r.viewName}Object.cs";
             string pagePath = $"./Results/{r.category}/{r.followingName}/{r.followingName}_{r.viewName}Page.cs";
             string mainPath = $"./Results/{r.category}/{r.followingName}/{r.followingName}_{r.viewName}.cs";
-
+            string txtPath = $"./Results/{r.category}/{r.followingName}/{r.followingName}_{r.viewName}.txt";
             Directory.CreateDirectory(mainDirPath);
 
 
@@ -133,7 +133,21 @@ public static class MainFunctionality
             await MainFunctionality.WriteObjectFile(objectPath, data);
             await MainFunctionality.WritePageFile(pagePath, data);
             await MainFunctionality.WriteMainFile(mainPath, data);
-
+            await MainFunctionality.WriteTxtFile(txtPath, data);
+        }
+    }
+    public static async Task WriteTxtFile(string txtPath, List<ResultModel> results) {
+        string xPaths = string.Empty;
+        foreach (ResultModel result in results)
+        {
+            xPaths += (@$"[LanguageKeyMapping(""{result.languageKey}"")]
+        public WebElement {result.fieldType}_{result.pageType}_{result.fieldName} => FindWebElement(By.XPath(""//{result.htmlElement}[@id='{result.name}']""));");
+            xPaths += Environment.NewLine;
+        }
+        using (StreamWriter writer = new StreamWriter(txtPath))
+        {
+            // Write the contents to the file
+            await writer.WriteAsync(xPaths);
         }
     }
     public static async Task WriteObjectFile(string objectPath, List<ResultModel> results)
@@ -147,7 +161,7 @@ public static class MainFunctionality
             string properties = string.Empty;
             foreach (ResultModel result in results)
             {
-                properties += $"public static string {result.fieldName} {{get;set;}}";
+                properties += $"public string {result.fieldName} {{get;set;}}";
                 properties += Environment.NewLine;
             }
             objectFile = objectFile.Replace(Enum.GetName(TemplatePlaceholder.CATEGORY_GOES_HERE)!, r.category);
@@ -178,7 +192,7 @@ public static class MainFunctionality
             foreach (ResultModel result in results)
             {
                 xPaths += (@$"[LanguageKeyMapping(""{result.languageKey}"")]
-        public WebElement {result.fieldType}_{result.pageType}_{result.fieldName} => FindWebElement(By.XPath(""//{result.htmlElement}[@id='{result.name}']""));");
+                               public WebElement {result.fieldType}_{result.pageType}_{result.fieldName} => FindWebElement(By.XPath(""//{result.htmlElement}[@id='{result.name}']""));");
                 xPaths += Environment.NewLine;
             }
             string pageFile = await File.ReadAllTextAsync("./Template/PageTemplate.cs");
@@ -186,7 +200,6 @@ public static class MainFunctionality
             pageFile = pageFile.Replace(Enum.GetName(TemplatePlaceholder.PAGENAME_GOES_HERE)!, r.className);
             pageFile = pageFile.Replace(Enum.GetName(TemplatePlaceholder.CLASSNAME_GOES_HERE)!, r.className);
             pageFile = pageFile.Replace(Enum.GetName(TemplatePlaceholder.XPATH_GOES_HERE)!, xPaths);
-
             using (StreamWriter writer = new StreamWriter(pagePath))
             {
                 // Write the contents to the file

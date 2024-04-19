@@ -1,19 +1,33 @@
 ﻿using System.Reflection;
+using LibGit2Sharp;
+using LibGit2Sharp.Handlers;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
 
 if (Config.modelParsingMode == ModelParsingMode.DynamicCompilation)
-    Helper.LoadAllNecessaryDll();
+    CustomAssemblies.LoadAllNecessaryDll();
 
-string viewPath = @"C:\Users\shuu\Workspace\DataTest\Views";
-string modelPath = @"C:\Users\shuu\Workspace\DataTest\HRM.Presentation.Hr.Models";
+string viewPath = @"D:\Code\Main\Source\Presentation\HRM.Presentation.Main\Views";
+string modelPath = @"D:\Code\Main\Source\Presentation";
 
-var builder = WebHost.CreateDefaultBuilder();
+string viewPathSingle = @"D:\Code\Main\Source\wt-1\Main\Source\Presentation\HRM.Presentation.Main\Views\Hre_Passport\Index.cshtml";
+string modelPathSingle = @"D:\Code\Main\Source\wt-1\Main\Source\Presentation\HRM.Presentation.Hr.Models\Hre_PassportModel.cs";
+
+Global.LANG_VN = await TFS.GetFileFromDevelopMain(@"/Main/Source/Presentation/HRM.Presentation.Main/Settings/LANG_VN.XML");
+
+
+//var builder = WebHost.CreateDefaultBuilder();
 
 
 
-await MainFunctionality.GenerateTests(Category.Hre, viewPath, modelPath);
+// await MainFunctionality.GenerateTests(Category.Hre, viewPath, modelPath);
+List<ResultModel> res = await MainFunctionality.GenerateDataForTestingFromViewAndModel( viewPathSingle, modelPathSingle);
+
+await MainFunctionality.WriteToFile(res);
+
+
+    
 
 
 // Config.modelParsingMode = ModelParsingMode.DynamicCompilation;
@@ -22,17 +36,3 @@ await MainFunctionality.GenerateTests(Category.Hre, viewPath, modelPath);
 // List<ResultModel> data = (await MainFunctionality
 //                                 .GenerateDataForTestingFromViewAndModel(viewPath, modelPath))
 //                                 .FilterBadElement().ToList();
-// ResultModel r = data[0];
-
-// string mainDirPath = $"./Results/{r.category}";
-// string objectPath = $"./Results/{r.category}/{r.followingName}Object.cs";
-// string pagePath = $"./Results/{r.category}/{r.followingName}Page.cs";
-// string mainPath = $"./Results/{r.category}/{r.followingName}.cs";
-
-// Directory.CreateDirectory(mainDirPath);
-
-
-
-// await MainFunctionality.WriteObjectFile(objectPath, data);
-// await MainFunctionality.WritePageFile(pagePath, data);
-// await MainFunctionality.WriteMainFile(mainPath, data);
