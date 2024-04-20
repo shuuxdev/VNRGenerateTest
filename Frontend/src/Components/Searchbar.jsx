@@ -3,21 +3,40 @@ import { FiSearch } from 'react-icons/fi';
 import { useState } from 'react';
 const SearchBar = () => {
     const [query, setQuery] = useState('');
-    const [results, setResults] = useState(["Testing stuff", "Testing stuff", "Testing stuff", "Testing stuff"]);
+    const [results, setResults] = useState([]);
+
+    const fetchListOfPagesAsync = async () => {
+        let projectID = "41abf2e0-a388-43de-9f5e-666da177bd5d";
+        let repositoryID = "15002d83-9470-4b0e-9a8d-7a655d9af004";
+        let path = ""
+        let branch = "develop-main";
+        // Construct the URL for the TFS REST API
+        let apiUrl = `http://172.21.35.3:8080/tfs/HRMCollection/${projectID}/_apis/git/repositories/${repositoryID}/Items?path=${path}&recursionLevel=0&includeContentMetadata=true&latestProcessedChange=false&download=false&versionDescriptor%5BversionType%5D=branch&versionDescriptor%5Bversion%5D=${branch}&includeContent=true`;
+        let data = await fetch("http://172.21.35.3:8080/tfs/HRMCollection/41abf2e0-a388-43de-9f5e-666da177bd5d/_apis/git/repositories/15002d83-9470-4b0e-9a8d-7a655d9af004/itemsBatch", {
+            "credentials": "include",
+            "headers": {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0",
+                "Accept": "application/json;api-version=4.1;excludeUrls=true",
+                "Accept-Language": "en,en-US;q=0.5",
+                "Content-Type": "application/json",
+                "X-VSS-ReauthenticationAction": "Suppress",
+                "X-TFS-Session": "60537a4f-1a8e-43af-baa3-98b076f59ee7",
+                "X-Requested-With": "XMLHttpRequest"
+            },
+            "referrer": "http://172.21.35.3:8080/tfs/HRMCollection/_git/HRM9/?path=%2FMain%2FSource%2FPresentation%2FHRM.Presentation.Main%2FViews%2FAtt_ApprovedLeaveday&version=GBdevelop-main&_a=contents",
+            "body": "{\"itemDescriptors\":[{\"path\":\"/Main/Source/Presentation/HRM.Presentation.Main/Views/Att_ApprovedLeaveday\",\"version\":\"develop-main\",\"versionType\":\"branch\",\"recursionLevel\":4}],\"includeContentMetadata\":true}",
+            "method": "POST",
+            "mode": "cors"
+        });
+    }
 
     const handleInputChange = async (event) => {
         const inputValue = event.target.value;
         setQuery(inputValue);
 
-        let projectID = "41abf2e0-a388-43de-9f5e-666da177bd5d";
-        let repositoryID = "15002d83-9470-4b0e-9a8d-7a655d9af004";
+        if (results.length == 0)
 
-        let branch = "develop-main";
-        // Construct the URL for the TFS REST API
-        let apiUrl = `http://172.21.35.3:8080/tfs/HRMCollection/${projectID}/_apis/git/repositories/${repositoryID}/Items?path=${path}&recursionLevel=0&includeContentMetadata=true&latestProcessedChange=false&download=false&versionDescriptor%5BversionType%5D=branch&versionDescriptor%5Bversion%5D=${branch}&includeContent=true`;
-        let data = await fetch(apiUrl, { credentials: "include", method: 'GET' }).then(res => res.json());
-
-        setResults(data);
+            setResults(data);
         // Perform search based on the input value
 
     };
