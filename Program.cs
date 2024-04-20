@@ -30,7 +30,8 @@ var customPath = Path.Combine(builder.Environment.ContentRootPath, "Assets");
 var fileProvider = new PhysicalFileProvider(customPath);
 
 app.UseRouting();
-app.UseStaticFiles(new StaticFileOptions{
+app.UseStaticFiles(new StaticFileOptions
+{
     FileProvider = fileProvider
 });
 // await MainFunctionality.GenerateTests(Category.Hre, viewPath, modelPath);

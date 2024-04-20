@@ -1,25 +1,32 @@
 import React from 'react';
 import { FiSearch } from 'react-icons/fi';
 import { useState } from 'react';
-const SearchBar = ({ placeholder, onSearch }) => {
+const SearchBar = () => {
     const [query, setQuery] = useState('');
-    const [results, setResults] = useState(["Testing stuff","Testing stuff","Testing stuff","Testing stuff"]);
+    const [results, setResults] = useState(["Testing stuff", "Testing stuff", "Testing stuff", "Testing stuff"]);
 
-    const handleInputChange = (event) => {
+    const handleInputChange = async (event) => {
         const inputValue = event.target.value;
         setQuery(inputValue);
 
+        let projectID = "41abf2e0-a388-43de-9f5e-666da177bd5d";
+        let repositoryID = "15002d83-9470-4b0e-9a8d-7a655d9af004";
+
+        let branch = "develop-main";
+        // Construct the URL for the TFS REST API
+        let apiUrl = `http://172.21.35.3:8080/tfs/HRMCollection/${projectID}/_apis/git/repositories/${repositoryID}/Items?path=${path}&recursionLevel=0&includeContentMetadata=true&latestProcessedChange=false&download=false&versionDescriptor%5BversionType%5D=branch&versionDescriptor%5Bversion%5D=${branch}&includeContent=true`;
+        let data = await fetch(apiUrl, { credentials: "include", method: 'GET' }).then(res => res.json());
+
+        setResults(data);
         // Perform search based on the input value
-        onSearch(inputValue).then((searchResults) => {
-            setResults(searchResults);
-        });
+
     };
 
     return (
         <div className="relative w-[400px]">
             <input
                 type="text"
-                placeholder={placeholder}
+                placeholder={"Nhập tên màn hình"}
                 className="w-full bg-white border-[1px] border-solid border-gray-200 py-2 pl-10 pr-4 rounded-full shadow-sm  focus:outline-none focus:shadow-outline"
                 value={query}
                 onChange={handleInputChange}
