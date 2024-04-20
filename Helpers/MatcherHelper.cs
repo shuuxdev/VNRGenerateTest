@@ -8,13 +8,58 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Emit;
 
-public static class PatternMatcherHelper
+public static class MatcherHelper
 {
     
     public static Assembly? compiledModel = null;
     
-
-   
+    
+    //Lưu ý phải dùng path của HRM9 chứ k được trỏ đại tới 1 thư mục bất kì
+    //Dạng dạng kiểu này
+    //HRM.Presentation.Main\Views\{Controller}\{Action}";
+    public static async Task<string> GetModelUsedInCshtmlFile(string cshtmlPath){
+        string className = string.Empty;
+        await foreach (string line in File.ReadLinesAsync(cshtmlPath))
+        {
+            //Tìm Model được sử dụng trong file cshtml này;
+            Match match = Regex.Match(line, @"^\@model\s+([a-zA-Z_.]*)", RegexOptions.Multiline);
+            if (match.Success)
+            {
+                string[] classNameWithDotsSeperated = match.Groups[1].Value.Split(".");
+                className = classNameWithDotsSeperated[classNameWithDotsSeperated.Length - 1];
+                break;
+            }
+        }
+        return className;
+    }
+    public static async Task<PageInfo> GetPageInfo(string cshtmlPath)
+    {
+        string controller = MatcherHelper.GetControllerFromPath(cshtmlPath);
+        string action = MatcherHelper.GetActionFromPath(cshtmlPath);
+        string category = controller.Split("_")[0];
+        string pageNameLanguageKey = MatcherHelper.GetPageLanguageKey(controller, action);
+        string pageNameVN =  MatcherHelper.Translate(pageNameLanguageKey);
+        string actionShortName  = action == "Index" ? "TK" : "TM";
+        string className = await MatcherHelper.GetModelUsedInCshtmlFile(cshtmlPath);
+        return new PageInfo(){
+            controller = controller,
+            action = action,
+            category = category,
+            pageNameLanguageKey = pageNameLanguageKey,
+            pageNameVN = pageNameVN,
+            actionShortName = actionShortName, 
+            className = className
+        };
+    }
+    public static string GetControllerFromPath(string path){
+        string controller = path.Split("\\")[path.Split("\\").Length - 2];
+        return controller;
+    }
+    public static string GetActionFromPath(string path)
+    {
+        string action = path.Substring(path.LastIndexOf("\\") + 1).Replace(".cshtml", string.Empty);
+        return action;
+    }
     public static string GetControlType(string originalControlType)
     {
         string result = originalControlType switch
@@ -57,14 +102,34 @@ public static class PatternMatcherHelper
     /// <param name="nameSpace"></param>
     /// <param name="className"></param>
     /// <returns></returns>
-    public static string? GetLanguageKeyFromLangVN(string property)
+    public static string? GetPageLanguageKey(string controller, string action){
+        string pattern = @$"\<mvcSiteMapNode title=\""(\w*)\"".*?controller=\""{controller}\""\s*action=\""{action}\""";
+        Match match = Regex.Match(Global.MVCSitemap, pattern, RegexOptions.Multiline);
+        if(match.Success)
+        {
+            return match.Groups[1].Value;
+        }
+        return null;
+    }
+    public static string? Translate(string languageKey) {
+        string pattern = @$"\<Language\s+Name=\""{languageKey}""\s*Value=""(.*)\""";
+        Match match = Regex.Match(Global.LANG_VN, pattern, RegexOptions.Multiline);
+        if(match.Success)
+        {
+            return match.Groups[1].Value;
+        }
+        return null;
+    }
+    public static string? GetPropertyDefaultLanguageKey(string property)
     {
+        if(string.IsNullOrEmpty(property)) return null;
+        
         if(Regex.Match(Global.LANG_VN, $@"\<Language Name=""{property}""").Success){
             return property;
         }
         return null;
     }
-    public static string? GetLanguageKeyFromModelFile(string modelPath, string className, string property)
+    public static string? GetPropertyLanguageKey(string modelPath, string className, string property)
     {
         string content = File.ReadAllText(modelPath);
         string nameSpace = Regex.Match(content, @"namespace\s*([a-zA-Z.]*)", RegexOptions.Multiline).Groups[1].Value;

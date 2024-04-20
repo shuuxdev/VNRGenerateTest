@@ -7,7 +7,7 @@ using System.Reflection;
 using System.ComponentModel;
 using Microsoft.CodeAnalysis.Host;
 using System.Text;
-public static class PatternMatchers
+public static class Matchers
 {
 
 
@@ -18,29 +18,24 @@ public static class PatternMatchers
     /// <param name="pattern"></param>
     /// <returns></returns>
 
-    [Pattern(@"Html\.Vnr(?!Label|Window|Button)(\w*\s*)\(\s*")]
-    public static async Task<List<ResultModel>> GetAllStandardControlsMatcherAsync(string cshtmlPath, string modelPath, string pattern)
+    [Pattern(@"Html\.Vnr(?!Label|Window|Button|Date)(\w*\s*)\(\s*")]
+    public static async Task<List<VnrControl>> GetAllStandardControlsMatcherAsync(string cshtmlPath, string modelPath, string pattern)
     {
         string content = await File.ReadAllTextAsync(cshtmlPath);
         Dictionary<(int startIndex, int endIndex), string> lines = DictionaryHelper.ToLines(content);
         MatchCollection matchCollection = Regex.Matches(content, pattern);
-        List<ResultModel> result = new();
+        List<VnrControl> result = new();
         foreach (Match match in matchCollection)
         {
 
             string fullControlName = match.Groups[1].Value;
-            string viewName = cshtmlPath.Substring(cshtmlPath.LastIndexOf("\\") + 1).Replace(".cshtml", string.Empty);
-            string[] classNameWithDotsSeperated = Regex.Match(content, @"^\@model\s+([a-zA-Z_.]*)", RegexOptions.Multiline).Groups[1].Value.Split(".");
-            string className = classNameWithDotsSeperated[classNameWithDotsSeperated.Length - 1];
-            string followingName = cshtmlPath.Split("\\")[cshtmlPath.Split("\\").Length - 2];
+            string className = await MatcherHelper.GetModelUsedInCshtmlFile(cshtmlPath);
             //Fields cần trả về
-            string category = followingName.Split("_")[0];
-            string controlType = PatternMatcherHelper.GetControlType(fullControlName.Replace("For", string.Empty)); //fieldType
-            string pageType = viewName == "Index" ? "TK" : "TM"; //pageType
+            string controlType = MatcherHelper.GetControlType(fullControlName.Replace("For", string.Empty)); //fieldType
             string property = null; //fieldName
             string languageKey = null; //languageKey
             string controlId = null;
-            string htmlElement = PatternMatcherHelper.GetHtmlElement(fullControlName.Replace("For", string.Empty));
+            string htmlElement = MatcherHelper.GetHtmlElement(fullControlName.Replace("For", string.Empty));
             //Trường hợp có dùng VnrControlFor, thì bên trong sẽ có truyền 1 delegate, delegate đó sẽ trả về property tương ứng trong model
             //Từ đó ta có thể tìm thấy key dịch bằng cách tìm property đó trong model
 
@@ -54,29 +49,31 @@ public static class PatternMatchers
                 //Thử tìm key dịch dựa trên property được sử dụng trong control
                 //Giả sử có control @Html.VnrComboBoxFor(model => model.ProfileID) 
                 // => ProfileID chính là property cần tìm trong file model
-                languageKey = PatternMatcherHelper.GetLanguageKeyFromModelFile(modelPath, className, property);
+                languageKey = MatcherHelper.GetPropertyLanguageKey(modelPath, className, property);
 
                 
             }
             if (languageKey == null)
             {
-                Match languageKeyMatch = null;
-                //Match VnrLabelFor = Regex.Match(scope, @"\@Html.VnrLabelFor\(\s*\w*\s*=>\s\w*\.(\w*)");
-                //Match VnrLabelOrRaw = Regex.Match(scope, @"\@Html\.(?:VnrLabel|Raw)\(ConstantDisplay\.(\w*)");
-                if ((languageKeyMatch = Regex.Match(scope, @"\@Html.VnrLabelFor\(\s*\w*\s*=>\s\w*\.(\w*)")).Success)
+                Match VnrLabelFor = Regex.Match(scope, @"\@Html.VnrLabelFor\(\s*\w*\s*=>\s\w*\.(\w*)");
+                Match VnrLabelOrRaw = Regex.Match(scope, @"\@Html\.(?:VnrLabel|Raw)\(ConstantDisplay\.(\w*)");
+                if (VnrLabelFor.Success)
                 {
                     if (string.IsNullOrEmpty(property))
                     {
-                        property = languageKeyMatch.Groups[1].Value;
+                        property = VnrLabelFor.Groups[1].Value;
                     }
-                    languageKey = PatternMatcherHelper.GetLanguageKeyFromModelFile(modelPath, className, property);
+                    languageKey = MatcherHelper.GetPropertyLanguageKey(modelPath, className, property);
                 }
-                else if ((languageKeyMatch = Regex.Match(scope, @"\@Html\.(?:VnrLabel|Raw)\(ConstantDisplay\.(\w*)")).Success)
+                else if (VnrLabelOrRaw.Success)
                 {
-                    languageKey = languageKeyMatch.Groups[1].Value;
+                    languageKey = VnrLabelOrRaw.Groups[1].Value;
                 }
             }
-
+            if(languageKey == null)
+            {
+                languageKey = MatcherHelper.GetPropertyDefaultLanguageKey(property);
+            }
             Console.ForegroundColor = ConsoleColor.Green;
             //Trường hợp tìm không thấy, ta sẽ thử tìm VnrLabel trong FieldTitle
             int newKeywordIndex = content.Substring(0, match.Index).LastIndexOf("new");
@@ -123,16 +120,11 @@ public static class PatternMatchers
 
             }
 
-            result.Add(new ResultModel()
+            result.Add(new VnrControl()
             {
-                followingName = followingName,
-                viewName = viewName,
-                className = className,
-                category = category,
-                fieldType = controlType,
-                pageType = pageType,
+                controlTypeShortname = controlType,
                 languageKey = languageKey,
-                fieldName = property,
+                property = property,
                 name = string.IsNullOrEmpty(controlId) ? property : controlId,
                 htmlElement = htmlElement
             });
@@ -141,12 +133,12 @@ public static class PatternMatchers
     }
 
     [Pattern(@"(VnrUpload)\(\w*\)")]
-    public static async Task<List<ResultModel>> GetVnrUploadControl(string cshtmlPath, string modelPath, string pattern)
+    public static async Task<List<VnrControl>> GetVnrUploadControl(string cshtmlPath, string modelPath, string pattern)
     {
         string content = await File.ReadAllTextAsync(cshtmlPath);
         Dictionary<(int startIndex, int endIndex), string> lines = DictionaryHelper.ToLines(content);
         MatchCollection matchCollection = Regex.Matches(content, pattern, RegexOptions.Multiline);
-        List<ResultModel> result = new();
+        List<VnrControl> result = new();
         foreach (Match match in matchCollection)
         {
             string fullControlName = match.Groups[1].Value;
@@ -156,12 +148,12 @@ public static class PatternMatchers
             string followingName = cshtmlPath.Split("\\")[cshtmlPath.Split("\\").Length - 2];
             //Fields cần trả về
             string category = followingName.Split("_")[0];
-            string controlType = PatternMatcherHelper.GetControlType(fullControlName.Replace("For", string.Empty)); //fieldType
+            string controlType = MatcherHelper.GetControlType(fullControlName.Replace("For", string.Empty)); //fieldType
             string pageType = viewName == "Index" ? "TK" : "TM"; //pageType
             string property = null; //fieldName
             string languageKey = null; //languageKey
             string controlId = null;
-            string htmlElement = PatternMatcherHelper.GetHtmlElement(fullControlName);
+            string htmlElement = MatcherHelper.GetHtmlElement(fullControlName);
             //Trường hợp có dùng VnrControlFor, thì bên trong sẽ có truyền 1 delegate, delegate đó sẽ trả về property tương ứng trong model
             //Từ đó ta có thể tìm thấy key dịch bằng cách tìm property đó trong model
 
@@ -178,7 +170,7 @@ public static class PatternMatchers
                     {
                         property = languageKeyMatch.Groups[1].Value;
                     }
-                    languageKey = PatternMatcherHelper.GetLanguageKeyFromModelFile(modelPath, className, property);
+                    languageKey = MatcherHelper.GetPropertyLanguageKey(modelPath, className, property);
                 }
                 else if ((languageKeyMatch = Regex.Match(scope, @"\@Html\.(?:VnrLabel|Raw)\(ConstantDisplay\.(\w*)")).Success)
                 {
@@ -192,16 +184,11 @@ public static class PatternMatchers
 
 
 
-            result.Add(new ResultModel()
+            result.Add(new VnrControl()
             {
-                followingName = followingName,
-                viewName = viewName,
-                className = className,
-                category = category,
-                fieldType = controlType,
-                pageType = pageType,
+                controlTypeShortname = controlType,
                 languageKey = languageKey,
-                fieldName = property,
+                property = property,
                 name = string.IsNullOrEmpty(controlId) ? property : controlId,
                 htmlElement = htmlElement
             });
@@ -209,12 +196,12 @@ public static class PatternMatchers
         return result;
     }
     [Pattern(@"(TreeViewDropdDownBuilderInfo)\(\w*\)")]
-    public static async Task<List<ResultModel>> GetTreeViewDropdown(string cshtmlPath, string modelPath, string pattern)
+    public static async Task<List<VnrControl>> GetTreeViewDropdown(string cshtmlPath, string modelPath, string pattern)
     {
         string content = await File.ReadAllTextAsync(cshtmlPath);
         Dictionary<(int startIndex, int endIndex), string> lines = DictionaryHelper.ToLines(content);
         MatchCollection matchCollection = Regex.Matches(content, pattern, RegexOptions.Multiline);
-        List<ResultModel> result = new();
+        List<VnrControl> result = new();
         foreach (Match match in matchCollection)
         {
             string fullControlName = match.Groups[1].Value;
@@ -224,12 +211,12 @@ public static class PatternMatchers
             string followingName = cshtmlPath.Split("\\")[cshtmlPath.Split("\\").Length - 2];
             //Fields cần trả về
             string category = followingName.Split("_")[0];
-            string controlType = PatternMatcherHelper.GetControlType(fullControlName); //fieldType
+            string controlType = MatcherHelper.GetControlType(fullControlName); //fieldType
             string pageType = viewName == "Index" ? "TK" : "TM"; //pageType
             string property = null; //fieldName
             string languageKey = null; //languageKey
             string controlId = null;
-            string htmlElement = PatternMatcherHelper.GetHtmlElement(fullControlName);
+            string htmlElement = MatcherHelper.GetHtmlElement(fullControlName);
             //Trường hợp có dùng VnrControlFor, thì bên trong sẽ có truyền 1 delegate, delegate đó sẽ trả về property tương ứng trong model
             //Từ đó ta có thể tìm thấy key dịch bằng cách tìm property đó trong model
 
@@ -247,7 +234,7 @@ public static class PatternMatchers
                     {
                         property = languageKeyMatch.Groups[1].Value;
                     }
-                    languageKey = PatternMatcherHelper.GetLanguageKeyFromModelFile(modelPath, className, property);
+                    languageKey = MatcherHelper.GetPropertyLanguageKey(modelPath, className, property);
                 }
                 else if ((languageKeyMatch = Regex.Match(scope, @"\@Html\.(?:VnrLabel|Raw)\(ConstantDisplay\.(\w*)")).Success)
                 {
@@ -303,16 +290,11 @@ public static class PatternMatchers
             }
 
 
-            result.Add(new ResultModel()
+            result.Add(new VnrControl()
             {
-                followingName = followingName,
-                viewName = viewName,
-                className = className,
-                category = category,
-                fieldType = controlType,
-                pageType = pageType,
+                controlTypeShortname = controlType,
                 languageKey = languageKey,
-                fieldName = property,
+                property = property,
                 name = string.IsNullOrEmpty(controlId) ? property : controlId,
                 htmlElement = htmlElement
             });

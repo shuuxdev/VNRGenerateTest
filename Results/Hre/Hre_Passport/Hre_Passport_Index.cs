@@ -13,7 +13,7 @@ using AutomationBase.Helper;
 using HRMMain.Common;
 using System.Data;
 
-namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
+namespace HRMMain.Test.Hre.Hre_PassportSearchModel
 {
     [TestFixture]
     [Category("Common Test")]
@@ -21,19 +21,19 @@ namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
     [DefineTestInfomation(Module: "Hre"
         , Feature: "Quản lý dữ liệu liên quan đến quá trình làm việc của nhân viên"
         , TestSuit: "Quản lý quá trình làm việc"
-        , TestScenario: "Hre_ProfileActiveKaizenSearchModel - Chức năng Thêm mới"
+        , TestScenario: "DS Hộ chiếu - Chức năng Thêm mới"
         , ScenarioDescription: "Kiểm tra chức năng tạo mới dữ liệu và các chức năng (ràng buộc) liên quan")]
     public class TaoMoi : MainSetup
     {
         [SetUp]
         public void SetUpTaoMoi()
         {
-            Hre_ProfileActiveKaizenSearchModelObject obj = new Hre_ProfileActiveKaizenSearchModelObject();
+            Hre_PassportSearchModelObject obj = new Hre_PassportSearchModelObject();
             var dataTest = DataTestHelper.GetDataTestByID(this.TestCaseID);
 
             if (!AppSettings.DataTestConfig_CreateNewData)
             {
-                Hre_ProfileActiveKaizenSearchModelPage page = new Hre_ProfileActiveKaizenSearchModelPage(this.driver, _logger);
+                Hre_PassportSearchModelPage page = new Hre_PassportSearchModelPage(this.driver, _logger);
                 if (this.TestCaseID == "Hre133-001" || this.TestCaseID == "Hre133-002"
                 || this.TestCaseID == "Hre133-003" || this.TestCaseID == "Hre133-004")
                 {
@@ -43,7 +43,7 @@ namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
                         this._logger.ChildError($"Vui lòng bổ sung data test cho Testcase [{this.TestCaseID}]");
                         Assert.Fail();
                     }
-                    obj = ConverDataTest<Hre_ProfileActiveKaizenSearchModelObject>.Encode(dataTest);
+                    obj = ConverDataTest<Hre_PassportSearchModelObject>.Encode(dataTest);
 
                     this._logger.ChildInformation("Vào màn hình");
                     page.GoToPage();
@@ -52,7 +52,7 @@ namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
                 }
                 if (this.TestCaseID == "Hre133-006")
                 {
-                    obj = ConverDataTest<Hre_ProfileActiveKaizenSearchModelObject>.Encode(dataTest);
+                    obj = ConverDataTest<Hre_PassportSearchModelObject>.Encode(dataTest);
 
                     this._logger.Precondition("Đảm bảo tồn tại 1 dòng dữ liệu trong hệ thống để tạo trùng.");
                     this._logger.ChildInformation("Vào màn hình");
@@ -74,8 +74,8 @@ namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
         [DefineTC("Hre133-001", "Thêm mới khen thưởng phòng ban thành công và đóng popUp thêm mới")]
         public void Hre133_001()
         {
-            Hre_ProfileActiveKaizenSearchModelPage page = new Hre_ProfileActiveKaizenSearchModelPage(this.driver, _logger);
-            var obj = ConverDataTest<Hre_ProfileActiveKaizenSearchModelObject>.GetDataTestByID(TestCaseID);
+            Hre_PassportSearchModelPage page = new Hre_PassportSearchModelPage(this.driver, _logger);
+            var obj = ConverDataTest<Hre_PassportSearchModelObject>.GetDataTestByID(TestCaseID);
 
             this._logger.Step("Vào màn hình");
             page.GoToPage();
@@ -107,8 +107,8 @@ namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
         [DefineTC("Hre133-002", "Thêm mới khen thưởng phòng ban thành công và điều chỉnh dữ liệu sau khi lưu")]
         public void Hre133_002()
         {
-            Hre_ProfileActiveKaizenSearchModelPage page = new Hre_ProfileActiveKaizenSearchModelPage(this.driver, _logger);
-            var obj = ConverDataTest<Hre_ProfileActiveKaizenSearchModelObject>.GetDataTestByID(TestCaseID);
+            Hre_PassportSearchModelPage page = new Hre_PassportSearchModelPage(this.driver, _logger);
+            var obj = ConverDataTest<Hre_PassportSearchModelObject>.GetDataTestByID(TestCaseID);
 
             this._logger.Step("Vào màn hình");
             page.GoToPage();
@@ -141,8 +141,8 @@ namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
         [DefineTC("Hre133-003", "Thêm mới khen thưởng phòng ban thành công và tiếp tục thêm mới")]
         public void Hre133_003()
         {
-            Hre_ProfileActiveKaizenSearchModelPage page = new Hre_ProfileActiveKaizenSearchModelPage(this.driver, _logger);
-            var obj = ConverDataTest<Hre_ProfileActiveKaizenSearchModelObject>.GetDataTestByID(TestCaseID);
+            Hre_PassportSearchModelPage page = new Hre_PassportSearchModelPage(this.driver, _logger);
+            var obj = ConverDataTest<Hre_PassportSearchModelObject>.GetDataTestByID(TestCaseID);
 
             this._logger.Step("Vào màn hình");
             page.GoToPage();
@@ -174,8 +174,8 @@ namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
         [DefineTC("Hre133-004", "Thêm mới khen thưởng phòng ban thành công và gửi email")]
         public void Hre133_004()
         {
-            Hre_ProfileActiveKaizenSearchModelPage page = new Hre_ProfileActiveKaizenSearchModelPage(this.driver, _logger);
-            var obj = ConverDataTest<Hre_ProfileActiveKaizenSearchModelObject>.GetDataTestByID(TestCaseID);
+            Hre_PassportSearchModelPage page = new Hre_PassportSearchModelPage(this.driver, _logger);
+            var obj = ConverDataTest<Hre_PassportSearchModelObject>.GetDataTestByID(TestCaseID);
 
             this._logger.Step("Vào màn hình");
             page.GoToPage();
@@ -207,8 +207,8 @@ namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
         [DefineTC("Hre133-005", "Hiển thị thông báo thành công khi nhấn lưu liên tục 2 lần")]
         public void Hre133_005()
         {
-            Hre_ProfileActiveKaizenSearchModelPage page = new Hre_ProfileActiveKaizenSearchModelPage(this.driver, _logger);
-            Hre_ProfileActiveKaizenSearchModelObject obj = new Hre_ProfileActiveKaizenSearchModelObject();
+            Hre_PassportSearchModelPage page = new Hre_PassportSearchModelPage(this.driver, _logger);
+            Hre_PassportSearchModelObject obj = new Hre_PassportSearchModelObject();
 
             this._logger.Step("Vào màn hình");
             page.GoToPage();
@@ -229,8 +229,8 @@ namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
         [DefineTC("Hre133-006", "Hiển thị cảnh báo với các trường bắt buộc nhập bị bỏ trống khi thêm mới khen thưởng phòng ban")]
         public void Hre133_006()
         {
-            Hre_ProfileActiveKaizenSearchModelPage page = new Hre_ProfileActiveKaizenSearchModelPage(this.driver, _logger);
-            Hre_ProfileActiveKaizenSearchModelObject obj = new Hre_ProfileActiveKaizenSearchModelObject();
+            Hre_PassportSearchModelPage page = new Hre_PassportSearchModelPage(this.driver, _logger);
+            Hre_PassportSearchModelObject obj = new Hre_PassportSearchModelObject();
 
             this._logger.Step("Vào màn hình");
             page.GoToPage();
@@ -249,8 +249,8 @@ namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
         [DefineTC("Hre133-007", "Hiển thị thông báo trùng dữ liệu khi nhập dữ liệu đã tồn tại trong hệ thống")]
         public void Hre133_007()
         {
-            Hre_ProfileActiveKaizenSearchModelPage page = new Hre_ProfileActiveKaizenSearchModelPage(this.driver, _logger);
-            Hre_ProfileActiveKaizenSearchModelObject obj = new Hre_ProfileActiveKaizenSearchModelObject();
+            Hre_PassportSearchModelPage page = new Hre_PassportSearchModelPage(this.driver, _logger);
+            Hre_PassportSearchModelObject obj = new Hre_PassportSearchModelObject();
 
             this._logger.ChildInformation("Vào màn hình");
             page.GoToPage();
@@ -272,8 +272,8 @@ namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
         [DefineTC("Hre133-008", "Hiển thị thông báo vượt quá giới hạn ký tự khi nhập tràn ký tự mỗi field")]
         public void Hre133_008()
         {
-            Hre_ProfileActiveKaizenSearchModelPage page = new Hre_ProfileActiveKaizenSearchModelPage(this.driver, _logger);
-            Hre_ProfileActiveKaizenSearchModelObject obj = new Hre_ProfileActiveKaizenSearchModelObject();
+            Hre_PassportSearchModelPage page = new Hre_PassportSearchModelPage(this.driver, _logger);
+            Hre_PassportSearchModelObject obj = new Hre_PassportSearchModelObject();
 
             this._logger.Step("Vào màn hình");
             page.GoToPage();
@@ -296,16 +296,16 @@ namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
     [DefineTestInfomation(Module: "Hre"
         , Feature: "Quản lý dữ liệu liên quan đến quá trình làm việc của nhân viên"
         , TestSuit: "Quản lý quá trình làm việc"
-        , TestScenario: "Hre_ProfileActiveKaizenSearchModel - Chức năng Lọc dữ liệu (Tìm kiếm)"
+        , TestScenario: "DS Hộ chiếu - Chức năng Lọc dữ liệu (Tìm kiếm)"
         , ScenarioDescription: "Kiểm tra chức năng tìm kiếm (lọc) dữ liệu và các chức năng (ràng buộc) liên quan")]
     public class TimKiem : MainSetup
     {
         [SetUp]
         public void SetUpTimKiem()
         {
-            Hre_ProfileActiveKaizenSearchModelObject obj = new Hre_ProfileActiveKaizenSearchModelObject();
+            Hre_PassportSearchModelObject obj = new Hre_PassportSearchModelObject();
             var dataTest = DataTestHelper.GetDataTestByID(this.TestCaseID);
-            Hre_ProfileActiveKaizenSearchModelPage page = new Hre_ProfileActiveKaizenSearchModelPage(this.driver, _logger);
+            Hre_PassportSearchModelPage page = new Hre_PassportSearchModelPage(this.driver, _logger);
             if (this.TestCaseID == "Hre133-009")
             {
                 if (!AppSettings.DataTestConfig_CreateNewData)
@@ -352,8 +352,8 @@ namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
         [DefineTC("Hre133-009", "Hiển thị đúng dữ liệu theo điều kiện lọc truyền vào")]
         public void Hre133_009()
         {
-            Hre_ProfileActiveKaizenSearchModelPage page = new Hre_ProfileActiveKaizenSearchModelPage(this.driver, _logger);
-            var obj = ConverDataTest<Hre_ProfileActiveKaizenSearchModelObject>.GetDataTestByID(TestCaseID);
+            Hre_PassportSearchModelPage page = new Hre_PassportSearchModelPage(this.driver, _logger);
+            var obj = ConverDataTest<Hre_PassportSearchModelObject>.GetDataTestByID(TestCaseID);
 
             this._logger.Step("Vào màn hình");
             page.GoToPage();
@@ -368,7 +368,7 @@ namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
         [DefineTC("Hre133-010", "Tự chuyển về trang 1 khi tìm kiếm ở trang khác trang 1")]
         public void Hre133_010()
         {
-            Hre_ProfileActiveKaizenSearchModelPage page = new Hre_ProfileActiveKaizenSearchModelPage(this.driver, _logger);
+            Hre_PassportSearchModelPage page = new Hre_PassportSearchModelPage(this.driver, _logger);
 
             this._logger.Step("Vào màn hình");
             page.GoToPage();
@@ -384,7 +384,7 @@ namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
     [DefineTestInfomation(Module: "Hre"
     , Feature: "Quản lý dữ liệu liên quan đến quá trình làm việc của nhân viên"
     , TestSuit: "Quản lý quá trình làm việc"
-    , TestScenario: "Hre_ProfileActiveKaizenSearchModel - Chức năng Cập nhật"
+    , TestScenario: "DS Hộ chiếu - Chức năng Cập nhật"
     , ScenarioDescription: "Kiểm tra chức năng cập nhật dữ liệu và các chức năng (ràng buộc) liên quan")]
     public class CapNhat : MainSetup
     {
@@ -392,8 +392,8 @@ namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
         public void SetUpCapNhat()
         {
             var dataTest = DataTestHelper.GetDataTestByID(this.TestCaseID);
-            Hre_ProfileActiveKaizenSearchModelPage page = new Hre_ProfileActiveKaizenSearchModelPage(this.driver, _logger);
-            Hre_ProfileActiveKaizenSearchModelObject obj = new Hre_ProfileActiveKaizenSearchModelObject();
+            Hre_PassportSearchModelPage page = new Hre_PassportSearchModelPage(this.driver, _logger);
+            Hre_PassportSearchModelObject obj = new Hre_PassportSearchModelObject();
             if (!AppSettings.DataTestConfig_CreateNewData)
             {
                 if (dataTest == null)
@@ -401,7 +401,7 @@ namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
                     this._logger.ChildError($"Vui lòng bổ sung data test cho Testcase [{this.TestCaseID}]");
                     Assert.Fail();
                 }
-                obj = ConverDataTest<Hre_ProfileActiveKaizenSearchModelObject>.Encode(dataTest);
+                obj = ConverDataTest<Hre_PassportSearchModelObject>.Encode(dataTest);
 
                 this._logger.Precondition("Đảm bảo tồn tại ít nhất 1 dòng dữ liệu trong hệ thống để cập nhật.");
                 this._logger.ChildInformation("Vào màn hình");
@@ -439,8 +439,8 @@ namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
         [DefineTC("Hre133-012", "Cập nhật thông tin khen thưởng phòng ban thành công")]
         public void Hre133_012()
         {
-            Hre_ProfileActiveKaizenSearchModelPage page = new Hre_ProfileActiveKaizenSearchModelPage(this.driver, _logger);
-            var obj = ConverDataTest<Hre_ProfileActiveKaizenSearchModelObject>.GetDataTestByID(TestCaseID);
+            Hre_PassportSearchModelPage page = new Hre_PassportSearchModelPage(this.driver, _logger);
+            var obj = ConverDataTest<Hre_PassportSearchModelObject>.GetDataTestByID(TestCaseID);
 
             this._logger.Step("Vào màn hình");
             page.GoToPage();
@@ -455,7 +455,7 @@ namespace HRMMain.Test.Hre.Hre_ProfileActiveKaizenSearchModel
         [DefineTC("Hre133-013", "Hiển thị thông báo trùng dữ liệu khi cập nhật trùng dữ liệu đã tồn tại trong hệ thống")]
         public void Hre133_013()
         {
-            Hre_ProfileActiveKaizenSearchModelPage page = new Hre_ProfileActiveKaizenSearchModelPage(this.driver, _logger);
+            Hre_PassportSearchModelPage page = new Hre_PassportSearchModelPage(this.driver, _logger);
 
             this._logger.Step("Vào màn hình");
             page.GoToPage();

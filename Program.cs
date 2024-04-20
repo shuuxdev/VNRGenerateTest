@@ -3,6 +3,7 @@ using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.FileProviders;
 
 
 if (Config.modelParsingMode == ModelParsingMode.DynamicCompilation)
@@ -15,24 +16,30 @@ string viewPathSingle = @"D:\Code\Main\Source\wt-1\Main\Source\Presentation\HRM.
 string modelPathSingle = @"D:\Code\Main\Source\wt-1\Main\Source\Presentation\HRM.Presentation.Hr.Models\Hre_PassportModel.cs";
 
 Global.LANG_VN = await TFS.GetFileFromDevelopMain(@"/Main/Source/Presentation/HRM.Presentation.Main/Settings/LANG_VN.XML");
+Global.MVCSitemap = await TFS.GetFileFromDevelopMain(@"/Main/Source/Presentation/HRM.Presentation.Main/Mvc.sitemap");
+// List<VnrControl> res = await MainFunctionality.GenerateControlsFromViewAndModel( viewPathSingle, modelPathSingle);
+// PageInfo pageInfo = await MatcherHelper.GetPageInfo(viewPathSingle);
+// await MainFunctionality.WriteToFile(res, pageInfo);
+
+var builder = WebApplication.CreateBuilder();
+builder.Services.AddControllersWithViews();
+var app = builder.Build();
 
 
-//var builder = WebHost.CreateDefaultBuilder();
+var customPath = Path.Combine(builder.Environment.ContentRootPath, "Assets");
+var fileProvider = new PhysicalFileProvider(customPath);
 
-
-
+app.UseRouting();
+app.UseStaticFiles(new StaticFileOptions{
+    FileProvider = fileProvider
+});
 // await MainFunctionality.GenerateTests(Category.Hre, viewPath, modelPath);
-List<ResultModel> res = await MainFunctionality.GenerateDataForTestingFromViewAndModel( viewPathSingle, modelPathSingle);
+app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+});
+app.Run();
 
-await MainFunctionality.WriteToFile(res);
-
-
-    
-
-
-// Config.modelParsingMode = ModelParsingMode.DynamicCompilation;
-// List<ResultModel> results1 = await Call();
-// Config.modelParsingMode = ModelParsingMode.StringProcessing;
-// List<ResultModel> data = (await MainFunctionality
-//                                 .GenerateDataForTestingFromViewAndModel(viewPath, modelPath))
-//                                 .FilterBadElement().ToList();

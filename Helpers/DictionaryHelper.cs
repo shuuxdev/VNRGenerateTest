@@ -78,6 +78,7 @@ public static class DictionaryHelper
     /// <para>[/div] </para>
     /// </summary>
     /// <returns></returns>
+    private static readonly object lockObject = new object();
     public static string GetCurrentVnrControlScope(int controlIndex, string[] lines, Dictionary<(int startIndex, int endIndex), string> linesDictionary, int maxLevel = 2)
     {
         int index = GetLineIndex(controlIndex, linesDictionary);
@@ -138,11 +139,7 @@ public static class DictionaryHelper
             }
         }
         string result = string.Empty;
-        // Console.ForegroundColor = ConsoleColor.Green;
-        // Console.WriteLine("===================================================================================");
-
-        // Console.ForegroundColor = ConsoleColor.DarkGreen;
-        // Console.WriteLine("Line: {0} -> {1}", up, down);
+        
 
         for (int i = Math.Max(up, 0); i <= Math.Min(down, lines.Length - 1); ++i)
         {
@@ -152,8 +149,18 @@ public static class DictionaryHelper
                 result += Environment.NewLine;
             }
         }
-        // Console.ForegroundColor = ConsoleColor.Yellow;
-        // Console.WriteLine(result);
+        if(Config.loggingMode == LoggingMode.Control || Config.loggingMode == LoggingMode.All){
+            lock(lockObject)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("===================================================================================");
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine("Line: {0} -> {1}", up, down);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(result);    
+            }
+            
+        }
 
         return result;
 

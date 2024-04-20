@@ -4,11 +4,11 @@ using System.Text.RegularExpressions;
 public static class MainFunctionality
 {
     private static readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
-    public static async Task<List<ResultModel>> GenerateDataForTestingFromViewAndModel(string viewPath, string modelPath)
+    public static async Task<List<VnrControl>> GenerateControlsFromViewAndModel(string viewPath, string modelPath)
     {
-        var matchers = typeof(PatternMatchers).GetMethods().ToList();
+        var matchers = typeof(Matchers).GetMethods().ToList();
 
-        List<Task<List<ResultModel>>> tasks = new();
+        List<Task<List<VnrControl>>> tasks = new();
         List<Matcher> listMatchers = new List<Matcher>();
         matchers.ForEach(matcher =>
         {
@@ -32,7 +32,7 @@ public static class MainFunctionality
         {
             tasks.Add(matcher.Method.Invoke(viewPath, modelPath, matcher.Pattern));
         });
-        List<ResultModel> results = (await Task.WhenAll(tasks)).SelectMany(resultFromMatcher => resultFromMatcher).ToList();
+        List<VnrControl> results = (await Task.WhenAll(tasks)).SelectMany(resultFromMatcher => resultFromMatcher).ToList();
         return results;
     }
 
@@ -46,14 +46,14 @@ public static class MainFunctionality
     public static async Task GenerateTests(Category category, string viewsPath, string modelsPath)
     {
         Dictionary<string, string> viewAndModel = await ToViewsAndModelsDictionary(category, viewsPath, modelsPath);
-        List<Task<List<ResultModel>>> tasks = new();
+        List<Task> tasks = new();
         foreach ((string viewPath, string modelPath) in viewAndModel)
         {
-            tasks.Add(GenerateDataForTestingFromViewAndModel(viewPath, modelPath));
+            List<VnrControl> controls = await GenerateControlsFromViewAndModel(viewPath, modelPath);
+            PageInfo pageInfo = await MatcherHelper.GetPageInfo(viewPath);
+            tasks.Add(WriteToFile(controls,pageInfo));
         }
-        List<List<ResultModel>> results = (await Task.WhenAll(tasks)).ToList();
-
-        await Task.WhenAll(results.Select(WriteToFile));
+        await Task.WhenAll(tasks);
     }
     public static async Task<Dictionary<string, string>> ToViewsAndModelsDictionary(Category category, string viewsPath, string modelsPath)
     {
@@ -97,7 +97,7 @@ public static class MainFunctionality
                 }
             }
         }
-
+        //TODO: Optimize lại 3 vòng for,  time complexity tương đối lớn
         foreach (string modelPath in modelPaths)
         {
             await foreach (string line in File.ReadLinesAsync(modelPath))
@@ -116,32 +116,35 @@ public static class MainFunctionality
         }
         return view;
     }
-    public static async Task WriteToFile(List<ResultModel> data)
+    public static async Task WriteToFile(List<VnrControl> data, PageInfo pageInfo)
     {
+        string controller = pageInfo.controller;
+        string action = pageInfo.action;
+        string category = pageInfo.category;
         if (data.Count > 0)
         {
-            ResultModel r = data[0];
-            string mainDirPath = $"./Results/{r.category}/{r.followingName}";
-            string objectPath = $"./Results/{r.category}/{r.followingName}/{r.followingName}_{r.viewName}Object.cs";
-            string pagePath = $"./Results/{r.category}/{r.followingName}/{r.followingName}_{r.viewName}Page.cs";
-            string mainPath = $"./Results/{r.category}/{r.followingName}/{r.followingName}_{r.viewName}.cs";
-            string txtPath = $"./Results/{r.category}/{r.followingName}/{r.followingName}_{r.viewName}.txt";
+            VnrControl r = data[0];
+            string mainDirPath = $"./Results/{category}/{controller}";
+            string objectPath = $"./Results/{category}/{controller}/{controller}_{action}Object.cs";
+            string pagePath = $"./Results/{category}/{controller}/{controller}_{action}Page.cs";
+            string mainPath = $"./Results/{category}/{controller}/{controller}_{action}.cs";
+            string txtPath = $"./Results/{category}/{controller}/{controller}_{action}.txt";
             Directory.CreateDirectory(mainDirPath);
 
 
 
-            await MainFunctionality.WriteObjectFile(objectPath, data);
-            await MainFunctionality.WritePageFile(pagePath, data);
-            await MainFunctionality.WriteMainFile(mainPath, data);
-            await MainFunctionality.WriteTxtFile(txtPath, data);
+            await MainFunctionality.WriteObjectFile(objectPath, data,pageInfo);
+            await MainFunctionality.WritePageFile(pagePath, data,pageInfo);
+            await MainFunctionality.WriteMainFile(mainPath, data,pageInfo);
+            await MainFunctionality.WriteTxtFile(txtPath, data,pageInfo);
         }
     }
-    public static async Task WriteTxtFile(string txtPath, List<ResultModel> results) {
+    public static async Task WriteTxtFile(string txtPath, List<VnrControl> results, PageInfo pageInfo) {
         string xPaths = string.Empty;
-        foreach (ResultModel result in results)
+        foreach (VnrControl result in results)
         {
             xPaths += (@$"[LanguageKeyMapping(""{result.languageKey}"")]
-        public WebElement {result.fieldType}_{result.pageType}_{result.fieldName} => FindWebElement(By.XPath(""//{result.htmlElement}[@id='{result.name}']""));");
+        public WebElement {result.controlTypeShortname}_{pageInfo.actionShortName}_{result.property} => FindWebElement(By.XPath(""//{result.htmlElement}[@id='{result.name}']""));");
             xPaths += Environment.NewLine;
         }
         using (StreamWriter writer = new StreamWriter(txtPath))
@@ -150,24 +153,25 @@ public static class MainFunctionality
             await writer.WriteAsync(xPaths);
         }
     }
-    public static async Task WriteObjectFile(string objectPath, List<ResultModel> results)
+    public static async Task WriteObjectFile(string objectPath, List<VnrControl> results, PageInfo pageInfo)
     {
         await semaphore.WaitAsync();
         try
         {
-            ResultModel r = results[0];
+            VnrControl r = results[0];
 
             string objectFile = await File.ReadAllTextAsync("./Template/ObjectTemplate.cs");
             string properties = string.Empty;
-            foreach (ResultModel result in results)
+            foreach (VnrControl result in results)
             {
-                properties += $"public string {result.fieldName} {{get;set;}}";
+                if(string.IsNullOrEmpty(result.property )) continue;
+                properties += $"public string {result.property} {{get;set;}}";
                 properties += Environment.NewLine;
             }
-            objectFile = objectFile.Replace(Enum.GetName(TemplatePlaceholder.CATEGORY_GOES_HERE)!, r.category);
+            objectFile = objectFile.Replace(Enum.GetName(TemplatePlaceholder.CATEGORY_GOES_HERE)!, pageInfo.category);
             //Tên màn hình (Tiếng việt)
-            objectFile = objectFile.Replace(Enum.GetName(TemplatePlaceholder.PAGENAME_GOES_HERE)!, r.className);
-            objectFile = objectFile.Replace(Enum.GetName(TemplatePlaceholder.CLASSNAME_GOES_HERE)!, r.className);
+            objectFile = objectFile.Replace(Enum.GetName(TemplatePlaceholder.PAGENAME_GOES_HERE)!, pageInfo.className);
+            objectFile = objectFile.Replace(Enum.GetName(TemplatePlaceholder.CLASSNAME_GOES_HERE)!, pageInfo.className);
             objectFile = objectFile.Replace(Enum.GetName(TemplatePlaceholder.PROPERTIES_GOES_HERE)!, properties);
 
             using (StreamWriter writer = new StreamWriter(objectPath))
@@ -182,23 +186,23 @@ public static class MainFunctionality
         }
     }
 
-    public static async Task WritePageFile(string pagePath, List<ResultModel> results)
+    public static async Task WritePageFile(string pagePath, List<VnrControl> results, PageInfo pageInfo)
     {
         await semaphore.WaitAsync();
         try
         {
-            ResultModel r = results[0];
+            VnrControl r = results[0];
             string xPaths = string.Empty;
-            foreach (ResultModel result in results)
+            foreach (VnrControl control in results)
             {
-                xPaths += (@$"[LanguageKeyMapping(""{result.languageKey}"")]
-                               public WebElement {result.fieldType}_{result.pageType}_{result.fieldName} => FindWebElement(By.XPath(""//{result.htmlElement}[@id='{result.name}']""));");
+                xPaths += (@$"[LanguageKeyMapping(""{control.languageKey}"")]
+        public WebElement {control.controlTypeShortname}_{pageInfo.actionShortName}_{control.property} => FindWebElement(By.XPath(""//{control.htmlElement}[@id='{control.name}']""));");
                 xPaths += Environment.NewLine;
             }
             string pageFile = await File.ReadAllTextAsync("./Template/PageTemplate.cs");
-            pageFile = pageFile.Replace(Enum.GetName(TemplatePlaceholder.CATEGORY_GOES_HERE)!, r.category);
-            pageFile = pageFile.Replace(Enum.GetName(TemplatePlaceholder.PAGENAME_GOES_HERE)!, r.className);
-            pageFile = pageFile.Replace(Enum.GetName(TemplatePlaceholder.CLASSNAME_GOES_HERE)!, r.className);
+            pageFile = pageFile.Replace(Enum.GetName(TemplatePlaceholder.CATEGORY_GOES_HERE)!,pageInfo.category);
+            pageFile = pageFile.Replace(Enum.GetName(TemplatePlaceholder.PAGENAME_GOES_HERE)!, pageInfo.pageNameVN);
+            pageFile = pageFile.Replace(Enum.GetName(TemplatePlaceholder.CLASSNAME_GOES_HERE)!, pageInfo.className);
             pageFile = pageFile.Replace(Enum.GetName(TemplatePlaceholder.XPATH_GOES_HERE)!, xPaths);
             using (StreamWriter writer = new StreamWriter(pagePath))
             {
@@ -212,16 +216,15 @@ public static class MainFunctionality
         }
 
     }
-    public static async Task WriteMainFile(string mainPath, List<ResultModel> results)
+    public static async Task WriteMainFile(string mainPath, List<VnrControl> results, PageInfo pageInfo)
     {
         await semaphore.WaitAsync();
         try
         {
-            ResultModel r = results[0];
             string mainFile = await File.ReadAllTextAsync("./Template/MainTemplate.cs");
-            mainFile = mainFile.Replace(Enum.GetName(TemplatePlaceholder.CATEGORY_GOES_HERE)!, r.category);
-            mainFile = mainFile.Replace(Enum.GetName(TemplatePlaceholder.PAGENAME_GOES_HERE)!, r.className);
-            mainFile = mainFile.Replace(Enum.GetName(TemplatePlaceholder.CLASSNAME_GOES_HERE)!, r.className);
+            mainFile = mainFile.Replace(Enum.GetName(TemplatePlaceholder.CATEGORY_GOES_HERE)!,pageInfo.category);
+            mainFile = mainFile.Replace(Enum.GetName(TemplatePlaceholder.PAGENAME_GOES_HERE)!, pageInfo.pageNameVN);
+            mainFile = mainFile.Replace(Enum.GetName(TemplatePlaceholder.CLASSNAME_GOES_HERE)!, pageInfo.className);
 
             using (StreamWriter writer = new StreamWriter(mainPath))
             {
