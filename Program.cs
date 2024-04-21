@@ -21,26 +21,29 @@ Global.MVCSitemap = await TFS.GetFileFromDevelopMain(@"/Main/Source/Presentation
 // PageInfo pageInfo = await MatcherHelper.GetPageInfo(viewPathSingle);
 // await MainFunctionality.WriteToFile(res, pageInfo);
 
-var builder = WebApplication.CreateBuilder();
-builder.Services.AddControllersWithViews();
-var app = builder.Build();
+string views = await TFS.GetFileFromDevelopMain("/Main/Source/Presentation/HRM.Presentation.Main/Views");
 
 
-var customPath = Path.Combine(builder.Environment.ContentRootPath, "Assets");
-var fileProvider = new PhysicalFileProvider(customPath);
+// var builder = WebApplication.CreateBuilder();
+// builder.Services.AddControllersWithViews();
+// var app = builder.Build();
 
-app.UseRouting();
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = fileProvider
-});
-// await MainFunctionality.GenerateTests(Category.Hre, viewPath, modelPath);
-app.MapControllers();
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
-});
-app.Run();
+
+// var customPath = Path.Combine(builder.Environment.ContentRootPath, "Assets");
+// var fileProvider = new PhysicalFileProvider(customPath);
+
+// app.UseRouting();
+// app.UseStaticFiles(new StaticFileOptions
+// {
+//     FileProvider = fileProvider
+// });
+// // await MainFunctionality.GenerateTests(Category.Hre, viewPath, modelPath);
+// app.MapControllers();
+// app.UseEndpoints(endpoints =>
+// {
+//     endpoints.MapControllerRoute(
+//         name: "default",
+//         pattern: "{controller=Home}/{action=Index}/{id?}");
+// });
+// app.Run();
 
