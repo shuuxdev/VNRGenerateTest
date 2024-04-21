@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.TeamFoundation.Core.WebApi.Team;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi.Legacy;
@@ -36,9 +37,37 @@ public static class TFS
             }
         }
     }
+    public static async Task<StreamReader> GetFileFromDevelopMainUsingStreamReader(string path)
+    {
+
+        string projectID = "41abf2e0-a388-43de-9f5e-666da177bd5d";
+        string repositoryID = "15002d83-9470-4b0e-9a8d-7a655d9af004";
+
+        string branch = "develop-main";
+        // Construct the URL for the TFS REST API
+        string apiUrl = $@"http://172.21.35.3:8080/tfs/HRMCollection/{projectID}/_apis/git/repositories/{repositoryID}/Items?path={path}&recursionLevel=0&includeContentMetadata=true&latestProcessedChange=false&download=false&versionDescriptor%5BversionType%5D=branch&versionDescriptor%5Bversion%5D={branch}&includeContent=true";
+
+        // Make an HTTP GET request to fetch the content of the file
+        using (var httpClient = new HttpClient(new HttpClientHandler { UseDefaultCredentials = true }))
+        {
+            var response = await httpClient.GetAsync(apiUrl);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var stream = await response.Content.ReadAsStreamAsync();
+                StreamReader streamReader = new StreamReader(stream);
+                return streamReader;
+
+            }
+            else
+            {
+                throw new Exception($"Lỗi không get được file từ TFS. Status code: {response.StatusCode}");
+            }
+        }
+    }
     public static async Task<List<string>> GetItemBatchFromDevelopMain(string path)
     {
-        
+
         // Construct the URL for the TFS REST API
         const String domain = "http://172.21.35.3:8080/tfs/HRMCollection";
         const String c_projectName = "HRM9";
@@ -52,10 +81,10 @@ public static class TFS
         //BasicAuthCredential basicAuthCredential = new BasicAuthCredential(networkCredential);
         WindowsCredential winCred = new WindowsCredential(networkCredential);
         VssCredentials vssCred = new VssClientCredentials(winCred);
-    // Connect to Azure DevOps Services
+        // Connect to Azure DevOps Services
         VssConnection connection = new VssConnection(orgUrl, vssCred);
 
-    // Get a GitHttpClient to talk to the Git endpoints
+        // Get a GitHttpClient to talk to the Git endpoints
         using (GitHttpClient gitClient = connection.GetClient<GitHttpClient>())
         {
             // Get data about a specific repository
@@ -63,47 +92,35 @@ public static class TFS
             List<GitItem> items = await gitClient.GetItemsAsync(
                 repo.Id,
                 recursionLevel: Microsoft.TeamFoundation.SourceControl.WebApi.VersionControlRecursionType.OneLevel,
-                scopePath:path,
+                scopePath: path,
                 versionDescriptor: new GitVersionDescriptor
-            {
-                VersionType = GitVersionType.Branch,
-                Version = "develop-main",
-                
-            });
-            
+                {
+                    VersionType = GitVersionType.Branch,
+                    Version = "develop-main",
+
+                });
+
             items.RemoveAt(0);
-            return  items.Select(item => item.Path).ToList();
+            return items.Select(item => item.Path).ToList();
         }
     }
-    public static async Task<Dictionary<string, string>> ToViewsAndModelsDictionary(Category category)
+    public static async Task<Dictionary<string, string>> ToViewsAndModelsDictionary()
     {
-        string[] viewDirectories = Directory.GetDirectories(viewsPath, $"*{Enum.GetName(category)}_*");
-        string[] modelPaths = null;
-        if (modelsPath.EndsWith("Presentation"))
-        {
-            string[] modelDirectories = Directory.GetDirectories(modelsPath, "HRM.Presentation.*.Models");
-            List<string> tempModelFilePaths = new();
-            foreach (string modelDirectory in modelDirectories)
-            {
-                tempModelFilePaths.AddRange(Directory.GetFiles(modelDirectory, $"*{Enum.GetName(category)}_*"));
-            }
-            modelPaths = tempModelFilePaths.ToArray();
-        }
-        else
-        {
-            modelPaths = Directory.GetFiles(modelsPath, $"*{Enum.GetName(category)}_*");
-        }
-        //viewDirectories = viewDirectories.Take(5).ToArray();
+        List<string> viewDirectories = await TFS.GetItemBatchFromDevelopMain(Global.TFSViewsPath);
+
+        List<string> modelPaths = await TFS.GetItemBatchFromDevelopMain(Global.TFSPresentationPath);
+
         List<(string viewPath, string model)> modelsUsed = new();
         Dictionary<string, string> view = new();
         //Loop qua toàn bộ màn hình của phân hệ
         foreach (string viewDirectoryPath in viewDirectories)
         {
             //Với mỗi màn hình sẽ có các file Cshtml
-            string[] viewPaths = Directory.GetFiles(viewDirectoryPath);
+            List<string> viewPaths = await TFS.GetItemBatchFromDevelopMain(viewDirectoryPath);
             foreach (string viewPath in viewPaths)
             {
-                await foreach (string line in File.ReadLinesAsync(viewPath))
+                StreamReader reader = await TFS.GetFileFromDevelopMainUsingStreamReader(viewPath);
+                await foreach (string line in ReadLinesAsync(reader))
                 {
                     //Tìm Model được sử dụng trong file cshtml này;
                     Match match = Regex.Match(line, @"^\@model\s+([a-zA-Z_.]*)", RegexOptions.Multiline);
@@ -136,5 +153,12 @@ public static class TFS
         }
         return view;
     }
-
+    private static async IAsyncEnumerable<string> ReadLinesAsync(StreamReader reader)
+    {
+        string line;
+        while ((line = await reader.ReadLineAsync()) != null)
+        {
+            yield return line;
+        }
+    }
 }
