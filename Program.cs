@@ -21,9 +21,11 @@ Global.MVCSitemap = await TFS.GetFileFromDevelopMain(@"/Main/Source/Presentation
 // PageInfo pageInfo = await MatcherHelper.GetPageInfo(viewPathSingle);
 // await MainFunctionality.WriteToFile(res, pageInfo);
 
-string views = await TFS.GetFileFromDevelopMain("/Main/Source/Presentation/HRM.Presentation.Main/Views");
+// string views = await TFS.GetItemBatchFromDevelopMain("/Main/Source/Presentation/HRM.Presentation.Main/Views");
+ await TFS.GetItemBatchFromDevelopMain(Global.TFSViewsPath) ;
 
 
+string a= "1";
 // var builder = WebApplication.CreateBuilder();
 // builder.Services.AddControllersWithViews();
 // var app = builder.Build();

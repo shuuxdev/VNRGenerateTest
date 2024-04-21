@@ -8,6 +8,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis" Version="4.10.0-2.final"/>
     <PackageReference Include="LibGit2Sharp" Version="0.30.0"/>
+    <PackageReference Include="Microsoft.TeamFoundationServer.Client" Version="16.205.1"/>
+    <PackageReference Include="Microsoft.TeamFoundationServer.ExtendedClient" Version="16.205.1"/>
     <Compile Remove="./Template/**/*"/>
     <Compile Remove="./Results/**/*"/>
   </ItemGroup>

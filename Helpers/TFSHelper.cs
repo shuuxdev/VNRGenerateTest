@@ -1,5 +1,12 @@
+using System.Net;
 using System.Text;
-
+using Microsoft.TeamFoundation.Core.WebApi.Team;
+using Microsoft.TeamFoundation.SourceControl.WebApi;
+using Microsoft.TeamFoundation.SourceControl.WebApi.Legacy;
+using Microsoft.VisualStudio.Services.Client;
+using Microsoft.VisualStudio.Services.Common;
+using Microsoft.VisualStudio.Services.WebApi;
+using GitItem = Microsoft.TeamFoundation.SourceControl.WebApi.GitItem;
 public static class TFS
 {
     public static async Task<string> GetFileFromDevelopMain(string path)
@@ -29,46 +36,105 @@ public static class TFS
             }
         }
     }
-    public static async Task<string> GetItemBatchFromDevelopMain(string path = "/Main/Source/Presentation/HRM.Presentation.Main/Views")
+    public static async Task<List<string>> GetItemBatchFromDevelopMain(string path)
     {
-        string projectID = "41abf2e0-a388-43de-9f5e-666da177bd5d";
-        string repositoryID = "15002d83-9470-4b0e-9a8d-7a655d9af004";
-
-
-        var jsonObject = new
-        {
-            itemDescriptors = new[]
-                {
-                    new
-                    {
-                        path = path,
-                        version = "develop-main",
-                        versionType = "branch",
-                        recursionLevel = 1
-                    }
-                },
-            includeContentMetadata = false
-        };
-
+        
         // Construct the URL for the TFS REST API
-        string apiUrl = $"http://172.21.35.3:8080/tfs/HRMCollection/{projectID}/_apis/git/repositories/{repositoryID}/itemsBatch";
+        const String domain = "http://172.21.35.3:8080/tfs/HRMCollection";
+        const String c_projectName = "HRM9";
+        const String c_repoName = "HRM9";
 
-        // Make an HTTP GET request to fetch the content of the file
-        using (var httpClient = new HttpClient(new HttpClientHandler { UseDefaultCredentials = true }))
+        Uri orgUrl = new Uri(domain);
+        string username = "nghia.huynhhieu";
+        string pwd = "4zkl.cmvn2k20.sv";
+
+        NetworkCredential networkCredential = new NetworkCredential(username, pwd);
+        //BasicAuthCredential basicAuthCredential = new BasicAuthCredential(networkCredential);
+        WindowsCredential winCred = new WindowsCredential(networkCredential);
+        VssCredentials vssCred = new VssClientCredentials(winCred);
+    // Connect to Azure DevOps Services
+        VssConnection connection = new VssConnection(orgUrl, vssCred);
+
+    // Get a GitHttpClient to talk to the Git endpoints
+        using (GitHttpClient gitClient = connection.GetClient<GitHttpClient>())
         {
-            //var response = await httpClient.PostAsync(apiUrl,body);
-            HttpResponseMessage response = await httpClient.PostAsJsonAsync(apiUrl, jsonObject);
-
-            if (response.IsSuccessStatusCode)
+            // Get data about a specific repository
+            var repo = gitClient.GetRepositoryAsync(c_projectName, c_repoName).Result;
+            List<GitItem> items = await gitClient.GetItemsAsync(
+                repo.Id,
+                recursionLevel: Microsoft.TeamFoundation.SourceControl.WebApi.VersionControlRecursionType.OneLevel,
+                scopePath:path,
+                versionDescriptor: new GitVersionDescriptor
             {
-                var content = await response.Content.ReadAsStringAsync();
-                return content;
-
-            }
-            else
-            {
-                throw new Exception($"Lỗi không get được file từ TFS. Status code: {response.StatusCode}");
-            }
+                VersionType = GitVersionType.Branch,
+                Version = "develop-main",
+                
+            });
+            
+            items.RemoveAt(0);
+            return  items.Select(item => item.Path).ToList();
         }
     }
+    public static async Task<Dictionary<string, string>> ToViewsAndModelsDictionary(Category category)
+    {
+        string[] viewDirectories = Directory.GetDirectories(viewsPath, $"*{Enum.GetName(category)}_*");
+        string[] modelPaths = null;
+        if (modelsPath.EndsWith("Presentation"))
+        {
+            string[] modelDirectories = Directory.GetDirectories(modelsPath, "HRM.Presentation.*.Models");
+            List<string> tempModelFilePaths = new();
+            foreach (string modelDirectory in modelDirectories)
+            {
+                tempModelFilePaths.AddRange(Directory.GetFiles(modelDirectory, $"*{Enum.GetName(category)}_*"));
+            }
+            modelPaths = tempModelFilePaths.ToArray();
+        }
+        else
+        {
+            modelPaths = Directory.GetFiles(modelsPath, $"*{Enum.GetName(category)}_*");
+        }
+        //viewDirectories = viewDirectories.Take(5).ToArray();
+        List<(string viewPath, string model)> modelsUsed = new();
+        Dictionary<string, string> view = new();
+        //Loop qua toàn bộ màn hình của phân hệ
+        foreach (string viewDirectoryPath in viewDirectories)
+        {
+            //Với mỗi màn hình sẽ có các file Cshtml
+            string[] viewPaths = Directory.GetFiles(viewDirectoryPath);
+            foreach (string viewPath in viewPaths)
+            {
+                await foreach (string line in File.ReadLinesAsync(viewPath))
+                {
+                    //Tìm Model được sử dụng trong file cshtml này;
+                    Match match = Regex.Match(line, @"^\@model\s+([a-zA-Z_.]*)", RegexOptions.Multiline);
+                    if (match.Success)
+                    {
+                        string[] classNameWithDotsSeperated = match.Groups[1].Value.Split(".");
+                        string className = classNameWithDotsSeperated[classNameWithDotsSeperated.Length - 1];
+                        modelsUsed.Add((viewPath, className));
+                        break;
+                    }
+                }
+            }
+        }
+        //TODO: Optimize lại 3 vòng for,  time complexity tương đối lớn
+        foreach (string modelPath in modelPaths)
+        {
+            await foreach (string line in File.ReadLinesAsync(modelPath))
+            {
+                //Tìm Model được sử dụng trong file cshtml này;
+                foreach ((string viewPath, string model) in modelsUsed)
+                {
+                    Match match = Regex.Match(line, @$"class\s+{model}", RegexOptions.Multiline);
+                    if (match.Success)
+                    {
+                        view[viewPath] = modelPath;
+                        break;
+                    }
+                }
+            }
+        }
+        return view;
+    }
+
 }

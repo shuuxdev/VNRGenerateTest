@@ -116,6 +116,7 @@ public static class MainFunctionality
         }
         return view;
     }
+    
     public static async Task WriteToFile(List<VnrControl> data, PageInfo pageInfo)
     {
         string controller = pageInfo.controller;

@@ -26,8 +26,7 @@ const SearchBar = () => {
             "referrer": "http://172.21.35.3:8080/tfs/HRMCollection/_git/HRM9/?path=%2FMain%2FSource%2FPresentation%2FHRM.Presentation.Main%2FViews%2FAtt_ApprovedLeaveday&version=GBdevelop-main&_a=contents",
             "body": "{\"itemDescriptors\":[{\"path\":\"/Main/Source/Presentation/HRM.Presentation.Main/Views/Att_ApprovedLeaveday\",\"version\":\"develop-main\",\"versionType\":\"branch\",\"recursionLevel\":4}],\"includeContentMetadata\":true}",
             "method": "POST",
-            "mode": "cors"
-        });
+        }).then(res => res.json());
     }
 
     const handleInputChange = async (event) => {
@@ -35,8 +34,12 @@ const SearchBar = () => {
         setQuery(inputValue);
 
         if (results.length == 0)
-
+        {
+            let data = await fetchListOfPagesAsync();
+            console.log(data);
             setResults(data);
+        }
+            
         // Perform search based on the input value
 
     };
